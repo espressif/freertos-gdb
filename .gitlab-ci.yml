@@ -1,0 +1,32 @@
+stages:
+  - check
+  - deploy
+
+pylint:
+  stage: check
+  image: python:3.9-slim-buster
+  tags: [ lint_python ]
+  artifacts:
+    reports:
+      codequality: pylint-report.json
+  before_script:
+    - pip install pylint-gitlab
+  script:
+    - files=$(find . -iname "*.py" -print);
+    - pylint --exit-zero --rcfile=.pylintrc $files -r n --output-format=pylint_gitlab.GitlabCodeClimateReporter > pylint-report.json
+
+publish_on_pypi:
+  image: python:3.9-slim-buster
+  stage: deploy
+  tags: [ internet ]
+  variables:
+    TWINE_NON_INTERACTIVE: "true"
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: ${PYPI_TOKEN}
+  before_script:
+    - apt update && apt install curl jq -y
+    - pip install twine
+  script:
+    - ./publish.sh
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'

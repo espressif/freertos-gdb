@@ -1,0 +1,5 @@
+*/__pycache__/
+.idea/
+dist/
+build/
+freertos_gdb.egg-info/

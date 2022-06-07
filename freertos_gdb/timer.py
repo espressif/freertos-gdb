@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2022 Espressif Systems (Shanghai) CO LTD
+# SPDX-License-Identifier: Apache-2.0
+#
 # pylint: disable=import-error
 import gdb
 from .common import StructProperty, FreeRtosList, print_table

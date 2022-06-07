@@ -29,16 +29,15 @@ class TaskProperty(StructProperty):
     PRI = ('Task priority', 'uxPriority', 'get_val')
     B_PRI = ('Base priority.', 'uxPriority', 'get_val')
     MUTEXES_HELD = ('', 'uxMutexesHeld', 'get_val')
-    SS = ('Used stack size.', 'pxStack', 'get_ss_val')
-    SL = ('Free/unused stack size.', 'pxEndOfStack', 'get_sl_val')
+    SS = ('Used stack size.', 'pxEndOfStack', 'get_ss_val')
+    SL = ('Free/unused stack size.', 'pxTopOfStack', 'get_sl_val')
     RTC = ('Stores the amount of time the task has spent in the Running state.', 'ulRunTimeCounter', 'get_val')
 
     def get_ss_val(self, task):
-        ss = task['pxTopOfStack'] - task[self.property]
-        return ss if ss > 0 else "OVFLW"
+        return abs(int(task[self.property]) - int(task['pxTopOfStack']))
 
     def get_sl_val(self, task):
-        return task[self.property] - task['pxTopOfStack']
+        return abs(int(task['pxStack']) - int(task['pxTopOfStack']))
 
 
 def get_current_tcbs():

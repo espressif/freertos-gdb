@@ -48,8 +48,11 @@ def get_current_tcbs():
     try:
         current_tcb = gdb.parse_and_eval('pxCurrentTCB')
     except gdb.error as err:
-        print(err, end='\n\n')
-        return current_tcb_arr
+        try:
+            current_tcb = gdb.parse_and_eval('pxCurrentTCBs')
+        except gdb.error as err:
+            print(err, end='\n\n')
+            return current_tcb_arr
 
     if current_tcb.type.code == gdb.TYPE_CODE_ARRAY:
         r = current_tcb.type.range()

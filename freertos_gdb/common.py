@@ -110,7 +110,6 @@ class FreeRtosList():
         self.end_marker = list_['xListEnd']
         self.head = self.end_marker['pxNext']  # ptr to start item
         self._length = list_['uxNumberOfItems']
-        self._index = 0
         self.check_length = check_length
 
     @property
@@ -125,15 +124,16 @@ class FreeRtosList():
 
     def __iter__(self):
         curr_node = self.head
+        index = 0
         while True:
             if curr_node == self.end_marker.address:
                 break
-            if self.check_length and (self._index >= self._length):
+            if self.check_length and index >= self._length:
                 break
             tmp_node = curr_node.dereference()
             data = tmp_node['pvOwner'].cast(self.cast_type)
             yield data
-            self._index += 1
+            index += 1
             curr_node = tmp_node['pxNext']
 
 

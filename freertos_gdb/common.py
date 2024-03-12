@@ -98,11 +98,19 @@ def print_table(table, headers=None):
 
 
 class FreeRtosList():
-    def __init__(self, list_, cast_type_str):
+    """Enumerator for an freertos list (ListItem_t)
+
+    :param list_: List to enumerate
+    :param cast_type_str: Type name to cast list items as
+    :param check_length: If True check uxNumberOfItems to stop iteration. By default check for reaching xListEnd.
+    """
+
+    def __init__(self, list_, cast_type_str, check_length: bool = False):
         self.cast_type = gdb.lookup_type(cast_type_str).pointer()
         self.end_marker = list_['xListEnd']
         self.head = self.end_marker['pxNext']  # ptr to start item
         self._length = list_['uxNumberOfItems']
+        self.check_length = check_length
 
     @property
     def length(self):
@@ -116,10 +124,16 @@ class FreeRtosList():
 
     def __iter__(self):
         curr_node = self.head
-        while curr_node != self.end_marker.address:
+        index = 0
+        while True:
+            if curr_node == self.end_marker.address:
+                break
+            if self.check_length and index >= self._length:
+                break
             tmp_node = curr_node.dereference()
             data = tmp_node['pvOwner'].cast(self.cast_type)
             yield data
+            index += 1
             curr_node = tmp_node['pxNext']
 
 

@@ -99,7 +99,7 @@ def get_table_row(task_ptr, state, current_tcbs):
 
 def get_table_rows(list_, state, current_tcbs):
     table = []
-    rtos_list = FreeRtosList(list_, 'TCB_t')
+    rtos_list = FreeRtosList(list_, 'TCB_t', check_length=True)
     for _, task_ptr in enumerate(rtos_list):
         if task_ptr == 0:
             print('SEEMS STACK WAS CORRUPTED. TASK POINTER IS NULL.')

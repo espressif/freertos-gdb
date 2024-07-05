@@ -4,12 +4,12 @@ Python module for user-friendly view freeRTOS-kernel objects in GDB
 
 ## Requirements
 
-GDB must built with python 3.6+ support
+GDB must built with python 2.7+ support
 
 Check your GDB with command:
 
 ```bash
-gdb -q -ex "python print('OK' if sys.version_info.major==3 and sys.version_info.minor>=6 else 'NOT SUPPORTED')" -ex "quit"
+gdb -q -ex "python print('OK' if sys.version_info.major==2 and sys.version_info.minor>=7 else 'NOT SUPPORTED')" -ex "quit"
 ```
 
 ## Install

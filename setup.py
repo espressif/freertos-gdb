@@ -3,13 +3,14 @@
 
 from setuptools import setup
 import sys
+import io
 
-with open('README.md', 'r', encoding='utf-8') as fh:
+with io.open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
-if sys.version_info[:2] < (3, 6):
+if sys.version_info[:2] < (2, 7):
     sys.exit(
-        'Python < 3.6 is not supported'
+        'Python < 2.7 is not supported'
     )
 
 setup(
@@ -31,6 +32,8 @@ setup(
         'Natural Language :: English',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -41,5 +44,5 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
     ],
     packages=['freertos_gdb'],
-    python_requires='>=3.6',
+    python_requires='>=2.7',
 )

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # pylint: disable=import-error
+from __future__ import print_function
 import gdb
 import enum
 
@@ -105,7 +106,7 @@ class FreeRtosList():
     :param check_length: If True check uxNumberOfItems to stop iteration. By default check for reaching xListEnd.
     """
 
-    def __init__(self, list_, cast_type_str, check_length: bool = False):
+    def __init__(self, list_, cast_type_str, check_length = False):
         self.cast_type = gdb.lookup_type(cast_type_str).pointer()
         self.end_marker = list_['xListEnd']
         self.head = self.end_marker['pxNext']  # ptr to start item
@@ -139,4 +140,4 @@ class FreeRtosList():
 
 class FreeRtos(gdb.Command):
     def __init__(self):
-        super().__init__('freertos', gdb.COMMAND_USER, gdb.COMPLETE_NONE, True)
+        super(FreeRtos, self).__init__('freertos', gdb.COMMAND_USER, gdb.COMPLETE_NONE, True)

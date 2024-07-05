@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # pylint: disable=import-error
+from __future__ import print_function
 import gdb
 from .common import StructProperty, FreeRtosList, print_table
 from .task import TaskProperty
@@ -149,7 +150,7 @@ class Queues:
 def get_task_id_name_str(task):
     task_id = TaskProperty.ID.get_val_as_is(task)
     task_name = TaskProperty.NAME.get_string_val(task)
-    return f'{task_id} {task_name}'
+    return '{task_id} {task_name}'.format(task_id = task_id, task_name = task_name)
 
 
 def show_queues_list(is_semaphore):
@@ -160,7 +161,7 @@ def show_queues_list(is_semaphore):
     try:
         queue_registry = gdb.parse_and_eval('xQueueRegistry')
     except gdb.error as err:
-        print(f'{err}\n{queue_registry_help}')
+        print('{err}\n{queue_registry_help}'.format(err = err, queue_registry_help = queue_registry_help))
         return
     queues = Queues(is_semaphore)
     for idx in range(queue_registry.type.range()[1] + 1):
@@ -174,7 +175,7 @@ class FreeRtosQueue(gdb.Command):
     """
 
     def __init__(self):
-        super().__init__('freertos queue', gdb.COMMAND_USER)
+        super(FreeRtosQueue, self).__init__('freertos queue', gdb.COMMAND_USER)
 
     @staticmethod
     def invoke(_, __):
@@ -186,7 +187,7 @@ class FreeRtosSemaphore(gdb.Command):
     """
 
     def __init__(self):
-        super().__init__('freertos semaphore', gdb.COMMAND_USER)
+        super(FreeRtosSemaphore, self).__init__('freertos semaphore', gdb.COMMAND_USER)
 
     @staticmethod
     def invoke(_, __):

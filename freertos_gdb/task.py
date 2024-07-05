@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # pylint: disable=import-error
+from __future__ import print_function
 import gdb
 import enum
 from .common import StructProperty, FreeRtosList, print_table
@@ -148,7 +149,7 @@ class FreeRtosTask(gdb.Command):
     """
 
     def __init__(self):
-        super().__init__('freertos task', gdb.COMMAND_USER)
+        super(FreeRtosTask, self).__init__('freertos task', gdb.COMMAND_USER)
 
     @staticmethod
     def invoke(_, __):

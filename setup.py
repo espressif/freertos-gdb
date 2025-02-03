@@ -14,7 +14,7 @@ if sys.version_info[:2] < (3, 6):
 
 setup(
     name='freertos-gdb',
-    version='1.0.3',
+    version='1.0.4',
     author='alexey.lapshin',
     author_email='alexey.lapshin@espressif.com',
     description='Python module for operating with freeRTOS-kernel objects in GDB',

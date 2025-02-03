@@ -29,12 +29,20 @@ class TaskProperty(StructProperty):
     TCB_NUM = ('Number that increments each time a TCB is created', 'uxTCBNumber', 'get_val')
     NAME = ('', 'pcTaskName', 'get_string_val')
     STATUS = ('', '', 'get_val_as_is')
+    AF = ('CPU affinity', 'xCoreID', 'get_af_val')
     PRI = ('Task priority', 'uxPriority', 'get_val')
     B_PRI = ('Base priority.', 'uxPriority', 'get_val')
     MUTEXES_HELD = ('', 'uxMutexesHeld', 'get_val')
     SS = ('Used stack size.', 'pxEndOfStack', 'get_ss_val')
     SL = ('Free/unused stack size.', 'pxTopOfStack', 'get_sl_val')
     RTC = ('Stores the amount of time the task has spent in the Running state.', 'ulRunTimeCounter', 'get_val')
+
+    def get_af_val(self, task):
+        val = int(task[self.property])
+        if val == 0x7FFFFFFF:
+            # this task has no affinity
+            return '-'
+        return 'CPU' + str(val)
 
     def get_ss_val(self, task):
         return abs(int(task[self.property]) - int(task['pxTopOfStack']))

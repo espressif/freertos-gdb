@@ -35,6 +35,7 @@ class TaskProperty(StructProperty):
     MUTEXES_HELD = ('', 'uxMutexesHeld', 'get_val')
     SS = ('Used stack size.', 'pxEndOfStack', 'get_ss_val')
     SL = ('Free/unused stack size.', 'pxTopOfStack', 'get_sl_val')
+    SHW = ('Stack high water mark (amount of stack space that has not been touched).', 'pxStack', 'get_shw_val')
     RTC = ('Stores the amount of time the task has spent in the Running state.', 'ulRunTimeCounter', 'get_val')
 
     def get_af_val(self, task):
@@ -50,6 +51,54 @@ class TaskProperty(StructProperty):
     def get_sl_val(self, task):
         return abs(int(task['pxStack']) - int(task['pxTopOfStack']))
 
+    def get_shw_val(self, task):
+        # If neither of these symbols are defined, it's likely that FreeRTOS
+        # was not configured to initialize stacks with fill bytes, and so there
+        # is no way to compute the high water mark.
+        hwm_sym, _ = gdb.lookup_symbol('uxTaskGetStackHighWaterMark')
+        hwm2_sym, _ = gdb.lookup_symbol('uxTaskGetStackHighWaterMark2')
+        if hwm_sym is None and hwm2_sym is None:
+            return '??'
+
+        fill_byte = b'\xa5'  # tskSTACK_FILL_BYTE
+
+        if not any(field.name == 'pxEndOfStack' for field in task.type.fields()):
+            # pxEndOfStack is not defined. Assume this means the stack grows
+            # downward (portSTACK_GROWTH == -1). In this case, we can only
+            # read out the currently unused part of the stack.
+            stack = gdb.selected_inferior().read_memory(
+                    task['pxStack'],
+                    int(task['pxTopOfStack']) - int(task['pxStack']))
+            direction = -1
+        else:
+            # pxEndOfStack is defined, so we can read out the complete stack.
+            stack = gdb.selected_inferior().read_memory(
+                    task['pxStack'],
+                    int(task['pxEndOfStack']) - int(task['pxStack']))
+            # Guess the stack growth direction based on which end appears to be
+            # unused.
+            if stack[:8] == fill_byte * 8:
+                direction = -1
+            elif stack[-8:] == fill_byte * 8:
+                direction = 1
+            else:
+                return '??'  # no fill bytes found so we don't know
+
+        count = 0
+        if direction == 1:
+            # Stack grows upwards, so start counting untouched bytes from the
+            # end backwards.
+            stack = reversed(stack)
+        for b in stack:
+            if b == fill_byte:
+                count += 1
+            else:
+                break
+
+        # Round down to nearest multiple of sizeof(StackType_t).
+        word_size = gdb.lookup_type('StackType_t').sizeof
+        count = count // word_size * word_size
+        return count
 
 def get_current_tcbs():
     current_tcb_arr = []
